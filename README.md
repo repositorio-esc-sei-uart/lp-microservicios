@@ -35,7 +35,6 @@ Create the database `demo` with a table called `usuario`:
 >COLLATE = utf8mb4_0900_ai_ci;
 
 Modify the properties in the file `src/main/java/application`.properties using the data from your test environment:
-
-`spring.datasource.url=jdbc:mysql://localhost:3306/dbname`
-`spring.datasource.username=username`
-`spring.datasource.password=pass`
+>spring.datasource.url=jdbc:mysql://localhost:3306/dbname
+>spring.datasource.username=username
+>spring.datasource.password=pass
