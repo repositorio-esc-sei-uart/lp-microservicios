@@ -13,6 +13,7 @@ import labintec.dev.demo.entidad.Usuario;
 import labintec.dev.demo.servicio.UsuarioService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.RestController;
  *
  * @author chari
  */
+@CrossOrigin(origins = {"http://127.0.0.1:5500", "http://localhost:4200"}) // Ambiente desarrollo: LiveServer
 @RestController
 @RequestMapping("api/v1/usuarios")
 public class UsuarioController {
@@ -68,11 +70,17 @@ public class UsuarioController {
         return UsuarioMapper.toDTO(nuevo);
     }
     
-    @PutMapping
+    @PutMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public UsuarioDTO actualizarUsuario(@Valid @RequestBody UsuarioDTO dto){
         Usuario modificado = servicio.actualizar(UsuarioMapper.toEntity(dto));
         return UsuarioMapper.toDTO(modificado);
+    }
+    
+    @DeleteMapping("/{id}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void eliminar(@PathVariable Long id){
+        servicio.eliminar(id);
     }
     
     @DeleteMapping("/username/{username}")

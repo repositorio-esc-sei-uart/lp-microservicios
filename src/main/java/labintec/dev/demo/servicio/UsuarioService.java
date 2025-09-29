@@ -48,6 +48,16 @@ public class UsuarioService {
         return opcional.get();
     }
     
+    public Usuario obtenerPorEmail(String email) {
+        Optional<Usuario> opcional = repositorio.findByEmail(email);
+        
+        if(!opcional.isPresent()) {
+            throw new RecursoNoEncontradoException("No existe usuario con email "
+            + email);
+        }
+        return opcional.get();
+    }
+    
     public Usuario crear(Usuario nuevo) {
         Optional<Usuario> opcional = repositorio.findByUsername(nuevo.getUsername());
         
@@ -59,15 +69,43 @@ public class UsuarioService {
         return repositorio.save(nuevo);
     } 
     
-    public Usuario actualizar(Usuario existente){
-        Optional<Usuario> opcional = repositorio.findById(existente.getCoduser());
+    public Usuario actualizar(Usuario modificado){
+        // usuario original antes de modificar
+        Optional<Usuario> original = repositorio.findById(modificado.getCoduser());
+        // en el caso que se haya modificado el username, buscar si ya existe otro usuario con ese username
+        Optional<Usuario> opcionalByUsername = repositorio.findByUsername(modificado.getUsername());
+        // en el caso que se haya modificado el email, buscar si ya existe ese email registrado
+        Optional<Usuario> opcionalByEmail = repositorio.findByEmail(modificado.getEmail());
+      
+        if(original.isPresent()) { 
+            if(opcionalByUsername.isPresent()) {
+                if(!opcionalByUsername.get().getUsername().equals(original.get().getUsername())) {
+                    throw new RecursoDuplicadoException("El usuario " + modificado.getUsername()
+                    + " ya existe.");
+                }
+            }
+            if(opcionalByEmail.isPresent()) {
+                if(!opcionalByEmail.get().getEmail().equals(original.get().getEmail())) {
+                    throw new RecursoDuplicadoException("El email " + modificado.getEmail()
+                    + " ya se encuentra en uso.");
+                }
+            }
+        } else {
+            throw new RecursoNoEncontradoException("El usuario " + original.get().getClass()
+                    + " no existe.");
+        }
+        return repositorio.save(modificado);
+    }
+    
+    public void eliminar(Long id) {
+        Optional<Usuario> opcional = repositorio.findById(id);
         
         if(!opcional.isPresent()) {
-            throw new RecursoNoEncontradoException("El usuario " 
-                    + existente + " no existe.");
+            throw new RecursoNoEncontradoException("El usuario con id " 
+                    + id + " no existe.");
         }
         
-        return repositorio.save(existente);
+        repositorio.deleteById(id);
     }
     
     @Transactional
